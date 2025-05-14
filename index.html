@@ -3,91 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <title>Mitarbeiterauswahl</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      background: #f0f2f5;
-    }
-
-    .container {
-      width: 600px;
-      max-height: 170px;
-      background: white;
-      border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-      border: 1px solid #e3e8ee;
-    }
-
-    .title {
-      font-size: 15px;
-      font-weight: 600;
-      color: #2d3748;
-      margin-bottom: 12px;
-      display: block;
-    }
-
-    #mitarbeiter {
-      width: 100%;
-      padding: 10px 14px;
-      border: 2px solid #e2e8f0;
-      border-radius: 8px;
-      font-size: 14px;
-      color: #1a202c;
-      background: white;
-      transition: all 0.2s ease;
-      appearance: none;
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    /* Custom dropdown arrow */
+    select {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
       background-repeat: no-repeat;
-      background-position: right 12px center;
-      background-size: 18px;
-    }
-
-    #mitarbeiter:focus {
-      outline: none;
-      border-color: #4299e1;
-      box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
-    }
-
-    #mitarbeiter option {
-      padding: 8px 12px;
-    }
-
-    #mitarbeiter option[disabled] {
-      color: #a0aec0;
-    }
-
-    .loading {
-      color: #718096;
-      font-style: italic;
-    }
-
-    .error {
-      color: #e53e3e;
+      background-position: right 0.75rem center;
+      background-size: 1.2em;
     }
   </style>
 </head>
-<body>
-  <div class="container">
-    <span class="title">Mitarbeiter auswählen</span>
-    <select id="mitarbeiter">
-      <option disabled class="loading">Lade Mitarbeiterliste...</option>
+<body class="flex justify-center items-center min-h-screen bg-gray-50">
+  <div class="w-[600px] h-[170px] bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+    <label class="block text-sm font-medium text-gray-600 mb-2">Mitarbeiter auswählen</label>
+    
+    <select 
+      id="mitarbeiter"
+      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-150 appearance-none"
+    >
+      <option disabled selected class="text-gray-400 italic">Lade Mitarbeiter...</option>
     </select>
   </div>
 
   <script>
-    // Unveränderter JavaScript-Code vom Original
     const DROPDOWN_ID = "mitarbeiter";
     const FLOW_URL = "https://prod-86.westeurope.logic.azure.com:443/workflows/2e0a97d831874a0288bf9e6ce0e65fad/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=CsOAnwfwyiFSphxxAwLl0dY1P-jbSxARv_58dDRWPMU";
 
     async function ladeMitarbeiter() {
       const select = document.getElementById(DROPDOWN_ID);
-      select.innerHTML = "<option disabled class='loading'>Lade Mitarbeiterliste...</option>";
+      select.innerHTML = '<option disabled class="text-gray-500 italic">Lade Daten...</option>';
 
       try {
         const response = await fetch(FLOW_URL, {
@@ -105,15 +50,16 @@
           return nameA.localeCompare(nameB);
         });
 
-        select.innerHTML = "<option disabled selected>Bitte auswählen</option>";
+        select.innerHTML = '<option disabled selected class="text-gray-400">Bitte auswählen</option>';
         mitarbeiterListe.forEach(eintrag => {
           const option = new Option(eintrag.Benutzername || "Unbenannt", eintrag.Benutzername);
+          option.className = "text-gray-700";
           select.add(option);
         });
 
       } catch (error) {
         console.error("Fehler beim Abruf:", error);
-        select.innerHTML = "<option disabled class='error'>Fehler beim Laden der Daten</option>";
+        select.innerHTML = '<option disabled class="text-red-600 italic">Fehler beim Laden</option>';
       }
     }
 
