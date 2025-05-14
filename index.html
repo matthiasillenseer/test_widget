@@ -60,8 +60,8 @@
         select.addEventListener("change", (event) => {
           const ausgewaehlt = event.target.value;
           if(window.parent.jotform) {
-            // WICHTIG: Ersetzen Sie 'id9' mit Ihrer Jotform-Feld-ID
-            window.parent.jotform.setFieldValue('id9', ausgewaehlt);
+            // WICHTIG: Ersetzen Sie 'input_10' mit Ihrer Jotform-Feld-ID
+            window.parent.jotform.setFieldValue('input_10', ausgewaehlt);
           } else {
             console.error('Jotform API nicht verfügbar');
           }
