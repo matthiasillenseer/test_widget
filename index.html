@@ -26,7 +26,7 @@
     </select>
   </div>
 
-<script>
+  <script>
     const DROPDOWN_ID = "mitarbeiter";
     const FLOW_URL = "https://prod-86.westeurope.logic.azure.com:443/workflows/2e0a97d831874a0288bf9e6ce0e65fad/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=CsOAnwfwyiFSphxxAwLl0dY1P-jbSxARv_58dDRWPMU";
 
@@ -35,27 +35,44 @@
       select.innerHTML = '<option disabled class="text-gray-500 italic">Lade Daten...</option>';
 
       try {
-        // ... (vorhandener Code bis zur Event-Listener-Erstellung bleibt gleich)
+        const response = await fetch(FLOW_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: "{}"
+        });
 
-        // Event Listener für Auswahländerung
+        const data = await response.json();
+        let mitarbeiterListe = data.employees || [];
+
+        mitarbeiterListe.sort((a, b) => {
+          const nameA = a.Benutzername?.toLowerCase() || "";
+          const nameB = b.Benutzername?.toLowerCase() || "";
+          return nameA.localeCompare(nameB);
+        });
+
+        select.innerHTML = '<option disabled selected class="text-gray-400">Bitte auswählen</option>';
+        mitarbeiterListe.forEach(eintrag => {
+          const option = new Option(eintrag.Benutzername || "Unbenannt", eintrag.Benutzername);
+          option.className = "text-gray-700";
+          select.add(option);
+        });
+
+        // Event Listener hinzufügen für Auswahl → Senden an parent
         select.addEventListener("change", (event) => {
           const ausgewählt = event.target.value;
-          
-          // Jotform-API zur Wertübergabe nutzen
-          if(window.parent.jotform) {
-            // Annahme: Ihr Feld-ID in Jotform lautet z.B. 'input_9'
-            window.parent.jotform.setFieldValue('input_9', ausgewählt);
-          } else {
-            console.error('Jotform API nicht verfügbar');
-          }
+          window.parent.postMessage({
+            type: "mitarbeiter-auswahl",
+            value: ausgewählt
+          }, "*");
         });
 
       } catch (error) {
-        // Fehlerbehandlung wie vorhanden
+        console.error("Fehler beim Abruf:", error);
+        select.innerHTML = '<option disabled class="text-red-600 italic">Fehler beim Laden</option>';
       }
     }
 
     ladeMitarbeiter();
-</script>
+  </script>
 </body>
 </html>
