@@ -1,37 +1,61 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- Kopfbereich unverändert wie vorher -->
+  <meta charset="UTF-8">
+  <title>Mitarbeiterauswahl</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom dropdown arrow */
+    select {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 1.2em;
+    }
+  </style>
 </head>
 <body class="flex justify-center items-center min-h-screen bg-gray-50">
-  <!-- Körperbereich unverändert -->
+  <div class="w-[600px] h-[170px] bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+    <label class="block text-sm font-medium text-gray-600 mb-2">Mitarbeiter auswählen</label>
+    
+    <select 
+      id="mitarbeiter"
+      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-150 appearance-none"
+    >
+      <option disabled selected class="text-gray-400 italic">Lade Mitarbeiter...</option>
+    </select>
+  </div>
 
-  <script>
+<script>
     const DROPDOWN_ID = "mitarbeiter";
-    const FLOW_URL = "IHR_FLOW_URL"; // Behalten Sie Ihre originale URL bei
-    const JOTFORM_FIELD_ID = "input_10"; // Hier angepasst
+    const FLOW_URL = "https://prod-86.westeurope.logic.azure.com:443/workflows/2e0a97d831874a0288bf9e6ce0e65fad/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=CsOAnwfwyiFSphxxAwLl0dY1P-jbSxARv_58dDRWPMU";
 
     async function ladeMitarbeiter() {
-      // Vorheriger Code bleibt gleich bis zum Event-Listener...
+      const select = document.getElementById(DROPDOWN_ID);
+      select.innerHTML = '<option disabled class="text-gray-500 italic">Lade Daten...</option>';
 
-      select.addEventListener("change", (event) => {
-        const ausgewaehlt = event.target.value;
-        console.log("Ausgewählter Wert:", ausgewaehlt); // Debug-Log
-        
-        try {
+      try {
+        // ... (vorhandener Code bis zur Event-Listener-Erstellung bleibt gleich)
+
+        // Event Listener für Auswahländerung
+        select.addEventListener("change", (event) => {
+          const ausgewählt = event.target.value;
+          
+          // Jotform-API zur Wertübergabe nutzen
           if(window.parent.jotform) {
-            window.parent.jotform.setFieldValue(JOTFORM_FIELD_ID, ausgewaehlt);
-            console.log("Wert an Jotform gesendet"); // Bestätigung
+            // Annahme: Ihr Feld-ID in Jotform lautet z.B. 'input_9'
+            window.parent.jotform.setFieldValue('input_9', ausgewählt);
           } else {
-            console.error("Jotform API nicht erreichbar");
+            console.error('Jotform API nicht verfügbar');
           }
-        } catch (error) {
-          console.error("Fehler bei der Übertragung:", error);
-        }
-      });
+        });
+
+      } catch (error) {
+        // Fehlerbehandlung wie vorhanden
+      }
     }
 
     ladeMitarbeiter();
-  </script>
+</script>
 </body>
 </html>
