@@ -1,13 +1,1 @@
-{
-  "name": "Mitarbeiterauswahl",
-  "description": "Wähle einen Mitarbeiter aus einer externen Quelle aus.",
-  "widgetType": "custom",
-  "displayName": "Mitarbeiter Dropdown",
-  "icon": "https://cdn-icons-png.flaticon.com/512/747/747376.png",
-  "index": "index.html",
-  "js": ["widget.js"],
-  "version": "1.0",
-  "width": 600,
-  "height": 200,
-  "properties": []
-}
+
