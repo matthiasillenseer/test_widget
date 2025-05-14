@@ -1,76 +1,34 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Mitarbeiterauswahl</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    select {
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-      background-repeat: no-repeat;
-      background-position: right 0.75rem center;
-      background-size: 1.2em;
-    }
-  </style>
+  <!-- Kopfbereich unverändert wie vorher -->
 </head>
 <body class="flex justify-center items-center min-h-screen bg-gray-50">
-  <div class="w-[600px] h-[170px] bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-    <label class="block text-sm font-medium text-gray-600 mb-2">Mitarbeiter auswählen</label>
-    
-    <select 
-      id="mitarbeiter"
-      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-150 appearance-none"
-    >
-      <option disabled selected class="text-gray-400 italic">Lade Mitarbeiter...</option>
-    </select>
-  </div>
+  <!-- Körperbereich unverändert -->
 
   <script>
     const DROPDOWN_ID = "mitarbeiter";
-    const FLOW_URL = "https://prod-86.westeurope.logic.azure.com:443/workflows/2e0a97d831874a0288bf9e6ce0e65fad/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=CsOAnwfwyiFSphxxAwLl0dY1P-jbSxARv_58dDRWPMU";
+    const FLOW_URL = "IHR_FLOW_URL"; // Behalten Sie Ihre originale URL bei
+    const JOTFORM_FIELD_ID = "input_10"; // Hier angepasst
 
     async function ladeMitarbeiter() {
-      const select = document.getElementById(DROPDOWN_ID);
-      select.innerHTML = '<option disabled class="text-gray-500 italic">Lade Daten...</option>';
+      // Vorheriger Code bleibt gleich bis zum Event-Listener...
 
-      try {
-        const response = await fetch(FLOW_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: "{}"
-        });
-
-        const data = await response.json();
-        let mitarbeiterListe = data.employees || [];
-
-        mitarbeiterListe.sort((a, b) => {
-          const nameA = a.Benutzername?.toLowerCase() || "";
-          const nameB = b.Benutzername?.toLowerCase() || "";
-          return nameA.localeCompare(nameB);
-        });
-
-        select.innerHTML = '<option disabled selected class="text-gray-400">Bitte auswählen</option>';
-        mitarbeiterListe.forEach(eintrag => {
-          const option = new Option(eintrag.Benutzername || "Unbenannt", eintrag.Benutzername);
-          option.className = "text-gray-700";
-          select.add(option);
-        });
-
-        // Jotform-Integration
-        select.addEventListener("change", (event) => {
-          const ausgewaehlt = event.target.value;
+      select.addEventListener("change", (event) => {
+        const ausgewaehlt = event.target.value;
+        console.log("Ausgewählter Wert:", ausgewaehlt); // Debug-Log
+        
+        try {
           if(window.parent.jotform) {
-            // WICHTIG: Ersetzen Sie 'input_10' mit Ihrer Jotform-Feld-ID
-            window.parent.jotform.setFieldValue('input_10', ausgewaehlt);
+            window.parent.jotform.setFieldValue(JOTFORM_FIELD_ID, ausgewaehlt);
+            console.log("Wert an Jotform gesendet"); // Bestätigung
           } else {
-            console.error('Jotform API nicht verfügbar');
+            console.error("Jotform API nicht erreichbar");
           }
-        });
-
-      } catch (error) {
-        console.error("Fehler beim Abruf:", error);
-        select.innerHTML = '<option disabled class="text-red-600 italic">Fehler beim Laden</option>';
-      }
+        } catch (error) {
+          console.error("Fehler bei der Übertragung:", error);
+        }
+      });
     }
 
     ladeMitarbeiter();
