@@ -57,6 +57,15 @@
           select.add(option);
         });
 
+        // Event Listener hinzufügen für Auswahl → Senden an parent
+        select.addEventListener("change", (event) => {
+          const ausgewählt = event.target.value;
+          window.parent.postMessage({
+            type: "mitarbeiter-auswahl",
+            value: ausgewählt
+          }, "*");
+        });
+
       } catch (error) {
         console.error("Fehler beim Abruf:", error);
         select.innerHTML = '<option disabled class="text-red-600 italic">Fehler beim Laden</option>';
