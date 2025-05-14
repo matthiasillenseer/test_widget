@@ -5,9 +5,8 @@
   <title>Mitarbeiterauswahl</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* Custom dropdown arrow */
     select {
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' ...");
       background-repeat: no-repeat;
       background-position: right 0.75rem center;
       background-size: 1.2em;
@@ -17,7 +16,6 @@
 <body class="flex justify-center items-center min-h-screen bg-gray-50">
   <div class="w-[600px] h-[170px] bg-white p-6 rounded-xl shadow-sm border border-gray-200">
     <label class="block text-sm font-medium text-gray-600 mb-2">Mitarbeiter auswählen</label>
-    
     <select 
       id="mitarbeiter"
       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-150 appearance-none"
@@ -27,48 +25,35 @@
   </div>
 
   <script>
-    const DROPDOWN_ID = "mitarbeiter";
-    const FLOW_URL = "https://prod-86.westeurope.logic.azure.com:443/workflows/2e0a97d831874a0288bf9e6ce0e65fad/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=CsOAnwfwyiFSphxxAwLl0dY1P-jbSxARv_58dDRWPMU";
+    const FLOW_URL = "https://prod-86.westeurope.logic.azure.com/...";
 
     async function ladeMitarbeiter() {
-      const select = document.getElementById(DROPDOWN_ID);
-      select.innerHTML = '<option disabled class="text-gray-500 italic">Lade Daten...</option>';
+      const select = document.getElementById("mitarbeiter");
+      select.innerHTML = '<option disabled>Lade...</option>';
 
       try {
-        const response = await fetch(FLOW_URL, {
+        const res = await fetch(FLOW_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: "{}"
         });
+        const data = await res.json();
+        const mitarbeiter = data.employees || [];
 
-        const data = await response.json();
-        let mitarbeiterListe = data.employees || [];
-
-        mitarbeiterListe.sort((a, b) => {
-          const nameA = a.Benutzername?.toLowerCase() || "";
-          const nameB = b.Benutzername?.toLowerCase() || "";
-          return nameA.localeCompare(nameB);
+        select.innerHTML = '<option disabled selected>Bitte auswählen</option>';
+        mitarbeiter.sort((a, b) => a.Benutzername.localeCompare(b.Benutzername));
+        mitarbeiter.forEach(e => {
+          const o = new Option(e.Benutzername, e.Benutzername);
+          select.add(o);
         });
 
-        select.innerHTML = '<option disabled selected class="text-gray-400">Bitte auswählen</option>';
-        mitarbeiterListe.forEach(eintrag => {
-          const option = new Option(eintrag.Benutzername || "Unbenannt", eintrag.Benutzername);
-          option.className = "text-gray-700";
-          select.add(option);
+        select.addEventListener("change", (e) => {
+          const name = e.target.value;
+          JFCustomWidget.sendData(name); // Das ist der wichtige Unterschied!
         });
 
-        // Event Listener hinzufügen für Auswahl → Senden an parent
-        select.addEventListener("change", (event) => {
-          const ausgewählt = event.target.value;
-          window.parent.postMessage({
-            type: "mitarbeiter-auswahl",
-            value: ausgewählt
-          }, "*");
-        });
-
-      } catch (error) {
-        console.error("Fehler beim Abruf:", error);
-        select.innerHTML = '<option disabled class="text-red-600 italic">Fehler beim Laden</option>';
+      } catch (err) {
+        select.innerHTML = '<option disabled>Fehler beim Laden</option>';
       }
     }
 
