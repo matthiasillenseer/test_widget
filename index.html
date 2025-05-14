@@ -17,7 +17,7 @@
 
     async function ladeMitarbeiter() {
       const select = document.getElementById(DROPDOWN_ID);
-      select.innerHTML = "<option>Lädt...</option>";
+      select.innerHTML = "<option>Aktualisierung läuft</option>";
 
       try {
         const response = await fetch(FLOW_URL, {
